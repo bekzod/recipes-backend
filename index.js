@@ -5,8 +5,6 @@ var express = require('express'),
     MongoClient = mongodb.MongoClient;
 
 var app = express();
-app.use( '/api', express.static('../recipes-crawler/images/') );
-
 var ingredients, recipes, mongo;
 
 MongoClient.connectAsync( process.env.MONGO_DATABASE_URI + '/recipes' )
@@ -89,7 +87,7 @@ app.get('/api/recipe', function(req,res){
         "ingredients": {"$first": '$ingredients'}
       }},
       {$sort: { total: -1,ingredientsCount: 1 } },
-      {$limit: 20},
+      {$limit: 15},
     ])
     .then(function(objs){
       res.send(objs);
