@@ -13,7 +13,7 @@ MongoClient.connectAsync( process.env.MONGO_DATABASE_URI + '/recipes' )
     ingredients = db.collection('ingredients');
   });
 
-app.get('/api/ingredient', function(req, res){
+app.get('/ingredient', function(req, res){
   var keys = req.query.keys;
   if( keys ){
     keys = keys.split(',');
@@ -32,7 +32,7 @@ app.get('/api/ingredient', function(req, res){
 });
 
 
-app.get('/api/ingredient/query', function(req, res){
+app.get('/ingredient/query', function(req, res){
   var q = req.query.q;
   if( q ){
     ingredients.find({
@@ -47,7 +47,7 @@ app.get('/api/ingredient/query', function(req, res){
   }
 });
 
-app.get('/api/recipe/:recipeId', function(req,res){
+app.get('/recipe/:recipeId', function(req,res){
   var id = req.params.recipeId;
   if( ObjectID.isValid( id ) ){
     recipes.findOneAsync({ _id: ObjectID( id ) })
@@ -59,7 +59,7 @@ app.get('/api/recipe/:recipeId', function(req,res){
   }
 });
 
-app.get('/api/recipe', function(req,res){
+app.get('/recipe', function(req,res){
   var keys = req.query.keys,
       limit = req.query.limit || 5,
       skip = req.query.skip || 0;
