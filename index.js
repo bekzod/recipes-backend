@@ -9,7 +9,7 @@ app.use( '/api', express.static('../recipes-crawler/images/') );
 
 var ingredients, recipes, mongo;
 
-MongoClient.connectAsync( process.env.MONGODB_URL )
+MongoClient.connectAsync( process.env.MONGO_DATABASE_URI + '/recipes' )
   .then(function( db ){
     recipes = db.collection('recipes');
     ingredients = db.collection('ingredients');
