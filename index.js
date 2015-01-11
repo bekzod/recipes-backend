@@ -5,55 +5,71 @@ var express = require('express'),
     MongoClient = mongodb.MongoClient;
 
 var app = express();
-var ingredients, recipes, mongo;
-
+var mongo;
 MongoClient.connectAsync( process.env.MONGO_DATABASE_URI + '/recipes' )
   .then(function( db ){
-    recipes = db.collection('recipes');
-    ingredients = db.collection('ingredients');
-  });
+    mongo = db;
+    console.log('connected to database');
+  }).error(function(e){
+    console.error(e);
+  })
 
 app.get('/ingredient', function(req, res){
   var keys = req.query.keys;
   if( keys ){
     keys = keys.split(',');
-    ingredients.find({
+    mongo.collection('ingredients').find({
       permutation: {
         $in: keys
       }
     })
     .toArrayAsync()
-    .error( res.sendStatus.bind( 500 ) )
     .bind(res)
+    .error( res.sendStatus.bind( 500 ) )
     .then(res.send);
   } else {
     res.sendStatus(400);
   }
 });
-
 
 app.get('/ingredient/query', function(req, res){
   var q = req.query.q;
   if( q ){
-    ingredients.find({
+    mongo.collection('ingredients').find({
       permutation: new RegExp('^' + q )
     })
     .toArrayAsync()
-    .error( res.sendStatus.bind( 500 ) )
-    .bind(res)
-    .then(res.send);
+    .bind( res )
+    .then( res.send )
+    .error( res.sendStatus.bind( res, 500 ) );
   } else {
     res.sendStatus(400);
   }
 });
 
+
+app.get('/ingredient/:ingredient', function(req, res){
+  var ingredientName = req.params.ingredient;
+  if( ingredientName ){
+    mongo.collection('ingredients').findOneAsync({
+      permutation: ingredientName
+    })
+    .bind(res)
+    .error( res.sendStatus.bind( res, 500 ) )
+    .then( res.send );
+  } else {
+    res.sendStatus(400);
+  }
+});
+
+
 app.get('/recipe/:recipeId', function(req,res){
   var id = req.params.recipeId;
   if( ObjectID.isValid( id ) ){
-    recipes.findOneAsync({ _id: ObjectID( id ) })
+    mongo.collection('recipes').findOneAsync({ _id: ObjectID( id ) })
       .bind( res )
       .then( res.send )
-      .error( res.sendStatus.bind( 500 ) );
+      .error( res.sendStatus.bind( res, 500 ) );
   } else {
     res.sendStatus(400);
   }
@@ -66,7 +82,7 @@ app.get('/recipe', function(req,res){
 
   if( keys ){
     var ingredients = keys.trim().split(',');
-    recipes.aggregateAsync([
+    mongo.collection('recipes').aggregateAsync([
       {$match: {ingredients: {$in: ingredients }}},
       {$project: {
         _id: 1,
@@ -89,9 +105,9 @@ app.get('/recipe', function(req,res){
       {$sort: { total: -1,ingredientsCount: 1 } },
       {$limit: limit},
     ])
-    .then(function(objs){
-      res.send(objs);
-    });
+    .bind(res)
+    .error( res.sendStatus.bind( res, 500 ) )
+    .then( res.send );
 
   } else {
     res.sendStatus(400);
