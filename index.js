@@ -61,7 +61,7 @@ app.get('/recipe/:recipeId', function(req,res){
 
 app.get('/recipe', function(req,res){
   var keys = req.query.keys,
-      limit = req.query.limit || 5,
+      limit = req.query.limit || 12,
       skip = req.query.skip || 0;
 
   if( keys ){
@@ -87,7 +87,7 @@ app.get('/recipe', function(req,res){
         "ingredients": {"$first": '$ingredients'}
       }},
       {$sort: { total: -1,ingredientsCount: 1 } },
-      {$limit: 15},
+      {$limit: limit},
     ])
     .then(function(objs){
       res.send(objs);
