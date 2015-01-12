@@ -1,3 +1,5 @@
+require('newrelic');
+
 var express = require('express'),
     Promise = require('bluebird'),
     mongodb = Promise.promisifyAll( require('mongodb') ),

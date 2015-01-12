@@ -12,6 +12,7 @@
   "dependencies": {
     "bluebird": "^2.6.2",
     "express": "^4.10.5",
-    "mongodb": "^1.4.28"
+    "mongodb": "^1.4.28",
+    "newrelic": "^1.14.6"
   }
 }
