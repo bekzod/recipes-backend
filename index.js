@@ -6,7 +6,7 @@ var express = require('express'),
 
 var app = express();
 var mongo;
-MongoClient.connectAsync( process.env.MONGO_DATABASE_URI + '/recipes' )
+MongoClient.connectAsync( process.env.MONGO_DATABASE_URI )
   .then(function( db ){
     mongo = db;
     console.log('connected to database');
